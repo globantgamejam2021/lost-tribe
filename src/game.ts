@@ -1,17 +1,15 @@
 import Phaser from 'phaser';
+import MainScene from './MainScene';
 
-export default class MainScene extends Phaser.Scene {
-  create() {
-    this.add.rectangle(0, 0, 200, 200, 0x6666ff);
-  }
-}
+const WIDTH = 512;
+const HEIGHT = 512;
 
 const configuration : Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   backgroundColor: '#125555',
   scale: {
-    width: 1920,
-    height: 1080,
+    width: WIDTH,
+    height: HEIGHT,
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     expandParent: true,
@@ -20,5 +18,5 @@ const configuration : Phaser.Types.Core.GameConfig = {
   scene: MainScene,
 };
 
-// eslint-disable-next-line no-unused-vars
 const game = new Phaser.Game(configuration);
+export default game;
