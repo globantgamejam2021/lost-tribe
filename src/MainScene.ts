@@ -4,8 +4,8 @@ import CharacterChard from './CharacterCard';
 import { animatedCharacterKeys, Level, levels } from './game';
 
 export default class MainScene extends Phaser.Scene {
-  clock: Phaser.Time.Clock;
   private currentLevel: Level;
+  private remainingTime: number;
   private characterCards: Phaser.GameObjects.Group;
 
   preload() {
@@ -29,12 +29,12 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
+    this.registry.set('currentLevel', 0);
     this.add.image(0, 0, 'background');
-    this.setUpStartingLevel();
     this.createAnimations();
     this.characterCards = this.add.group();
     this.addPressableObjectsToScene();
-    this.setUpClock();
+    this.setUpCurrentLevel();
   }
 
   createAnimations() {
@@ -48,32 +48,41 @@ export default class MainScene extends Phaser.Scene {
     );
   }
 
-  setUpStartingLevel() {
-    this.registry.set('currentLevel', 0);
-    [this.currentLevel] = levels;
-  }
-
   addPressableObjectsToScene() {
     this.currentLevel.objectCoordinates.forEach(([x, y], index) => {
       const characterKey = `character${index}Level${this.registry.values.currentLevel}`;
       const characterCard = new CharacterChard(this, x, y, {
         characterKey,
-        pressAction: index === this.currentLevel.correctCharacter
-          ? this.handleCorrectPress : this.handleWrongPress,
+        isCorrect: index === this.currentLevel.correctCharacter,
+        pressAction: this.handlePress,
       });
       this.characterCards.add(characterCard);
     });
   }
 
-  handleCorrectPress() {
+  handlePress(isCorrect: boolean) {
+    if (isCorrect) this.win();
+    else {
+      this.updateTime(this.currentLevel.timeLossOnError);
+    }
+  }
+
+  setUpCurrentLevel() {
+    this.currentLevel = levels[this.registry.values.currentLevel];
+    this.remainingTime = this.currentLevel.time;
+    this.time.addEvent({ delay: 1000, callback: this.updateTime.bind(this, -1) });
+  }
+
+  updateTime(timeDelta: number) {
+    this.remainingTime = Math.max(0, this.remainingTime + timeDelta);
+    if (this.remainingTime === 0) this.lose();
+  }
+
+  win() {
 
   }
 
-  handleWrongPress() {
-
-  }
-
-  setUpClock() {
+  lose() {
 
   }
 }

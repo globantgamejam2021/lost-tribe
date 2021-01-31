@@ -5,7 +5,8 @@ import MainScene from './MainScene';
 
 export type CharacterCardProps = {
   characterKey: string;
-  pressAction: () => void;
+  isCorrect: boolean;
+  pressAction: (isCorrect: boolean) => void;
 }
 
 export default class CharacterChard extends Phaser.GameObjects.Sprite {
@@ -21,6 +22,6 @@ export default class CharacterChard extends Phaser.GameObjects.Sprite {
 
   handleClick() {
     const { pressAction } = this.props;
-    pressAction();
+    pressAction(this.props.isCorrect);
   }
 }

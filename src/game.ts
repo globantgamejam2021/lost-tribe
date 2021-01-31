@@ -10,6 +10,8 @@ export type CharacterFrameData = {
 
 export type Level = {
   time: number,
+  timeLossOnError: number,
+  correctCharacter: number;
   objectCoordinates: [number, number][];
 }
 
@@ -25,6 +27,8 @@ export const animatedCharacterKeys: { [key: string]: CharacterFrameData } = {
 export const levels: Level[] = [
   {
     time: 60,
+    timeLossOnError: 3,
+    correctCharacter: 19, // ???
     objectCoordinates: [[100, 300], [250, 300], [400, 300]],
   },
 ];
