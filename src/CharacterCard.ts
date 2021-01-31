@@ -1,33 +1,26 @@
 import _ from 'lodash';
 import Phaser from 'phaser';
-import MainScene, { characterKeys } from './MainScene';
+import { animatedCharacterKeys } from './game';
+import MainScene from './MainScene';
 
 export type CharacterCardProps = {
-  correctPressAction: () => void;
-  wrongPressAction: () => void;
+  characterKey: string;
+  pressAction: () => void;
 }
 
 export default class CharacterChard extends Phaser.GameObjects.Sprite {
-  private characterKey: string;
   private props: CharacterCardProps;
 
   constructor(scene: MainScene, x: number, y: number, props: CharacterCardProps) {
-    super(scene, x, y, null);
+    const isAnimated = props.characterKey in animatedCharacterKeys;
+    super(scene, x, y, isAnimated ? null : props.characterKey);
     this.props = props;
-    this.characterKey = _.sample(characterKeys).key;
-    this.setInteractive().on('pointerdown', this.handleClick);
+    this.setInteractive().on('pointerdown', _.debounce(this.handleClick, 2000, { leading: true }));
+    if (isAnimated) this.anims.play(props.characterKey);
   }
 
   handleClick() {
-    const { correctPressAction, wrongPressAction } = this.props;
-    const isCorrect = this.characterKey === this.scene.registry.get('correctCharacterKey');
-
-    if (isCorrect) correctPressAction();
-    else wrongPressAction();
-    this.refreshCharacterCard();
-  }
-
-  refreshCharacterCard() {
-
+    const { pressAction } = this.props;
+    pressAction();
   }
 }
