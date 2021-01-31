@@ -3,6 +3,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import serve from 'rollup-plugin-serve';
 import typescript from 'rollup-plugin-typescript2';
+import copy from 'rollup-plugin-copy-assets';
 
 export default {
   input: [
@@ -10,12 +11,17 @@ export default {
   ],
   output: {
     file: './dist/game.js',
-    name: 'Lost Tribe',
+    name: 'LostTribe',
     format: 'iife',
     sourcemap: true,
     intro: 'var global = window;',
   },
   plugins: [
+    copy({
+      assets: [
+        'src/assets',
+      ],
+    }),
     replace({
       'typeof CANVAS_RENDERER': JSON.stringify(true),
       'typeof WEBGL_RENDERER': JSON.stringify(true),
