@@ -1,13 +1,22 @@
+import _ from 'lodash';
 import Phaser from 'phaser';
-import CharacterChard from './CharacterCard';
+import CharacterChard, { CharacterCardProps } from './CharacterCard';
 
-const correctResponseProbability = 0.3;
-const [objectWidth, objectsHeight] = [75, 175];
+export type CharacterFrameData = {
+  key: string;
+  start: number;
+  end: number;
+}
+
 const objectCoordinates: [number, number][] = [[100, 300], [250, 300], [400, 300]];
+export const characterKeys: CharacterFrameData[] = [
+  { key: 'character1', start: 0, end: 1 },
+  { key: 'character2', start: 0, end: 3 },
+];
 
 export default class MainScene extends Phaser.Scene {
   clock: Phaser.Time.Clock;
-  rectangles: Phaser.GameObjects.Rectangle[] = [];
+  private characterCards: Phaser.GameObjects.Group;
 
   preload() {
     this.load.spritesheet('character1Frames', 'assets/character-1.png', { frameWidth: 94, frameHeight: 104 });
@@ -15,33 +24,38 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
-    this.anims.create({
-      key: 'character1',
-      frames: this.anims.generateFrameNumbers('character1', { start: 0, end: 1 }),
-      frameRate: 2,
-      repeat: -1,
-    });
+    this.createAnimations();
+    this.characterCards = this.add.group();
+    this.registry.set('correctCharacterKey', _.sample(characterKeys).key);
     this.addPressableObjectsToScene();
-    this.add.existing(new CharacterChard(this, 100, 100, 'character1'));
+  }
+
+  createAnimations() {
+    characterKeys.forEach(({ key, start, end }) => this.anims.create({
+      key,
+      frames: this.anims.generateFrameNumbers(`${key}Frames`, { start, end }),
+      frameRate: 4,
+      repeat: -1,
+    }));
   }
 
   addPressableObjectsToScene() {
-    this.rectangles = objectCoordinates.map(([x, y]) => this.createNewRectangle(x, y));
+    objectCoordinates.forEach(([x, y]) => {
+      const characterCard = new CharacterChard(this, x, y, this.characterCardProps);
+      this.characterCards.add(characterCard);
+    });
   }
 
-  private createNewRectangle(x: number, y: number) {
-    const [isCorrect, color] = this.getRandomObjectProperties();
-    const rectangle = this.add.rectangle(x, y, objectWidth, objectsHeight, color)
-      .setInteractive().setData('isCorrect', isCorrect);
-    return rectangle.on('pointerdown', this.handleObjectClick.bind(this, rectangle));
+  characterCardProps: CharacterCardProps = {
+    correctPressAction: this.handleCorrectPress,
+    wrongPressAction: this.handleWrongPress,
+  };
+
+  handleCorrectPress() {
+
   }
 
-  private handleObjectClick = (gameObject) => {
-    alert(Object.keys(gameObject));
-  }
+  handleWrongPress() {
 
-  private getRandomObjectProperties: () => [boolean, number] = () => {
-    if (Math.random() < correctResponseProbability) return [false, 0x00f000];
-    return [true, 0xff0000];
   }
 }
