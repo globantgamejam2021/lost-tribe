@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import Phaser from 'phaser';
 import CharacterChard from './CharacterCard';
 import { animatedCharacterKeys, Level, levels } from './game';

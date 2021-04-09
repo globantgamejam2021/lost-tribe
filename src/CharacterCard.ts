@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { debounce } from 'lodash';
 import Phaser from 'phaser';
 import { animatedCharacterKeys } from './game';
 import MainScene from './MainScene';
@@ -16,7 +16,7 @@ export default class CharacterChard extends Phaser.GameObjects.Sprite {
     const isAnimated = props.characterKey in animatedCharacterKeys;
     super(scene, x, y, isAnimated ? null : props.characterKey);
     this.props = props;
-    this.setInteractive().on('pointerdown', _.debounce(this.handleClick, 2000, { leading: true }));
+    this.setInteractive().on('pointerdown', debounce(this.handleClick, 2000, { leading: true }));
     if (isAnimated) this.anims.play(props.characterKey);
   }
 
